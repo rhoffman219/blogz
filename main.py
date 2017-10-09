@@ -26,7 +26,7 @@ class Blog(db.Model):
 
     title = db.Column(db.String(120))
 
-    body = db.Column(db.String(65535))
+    body = db.Column(db.String(20,000))
 
 
 
@@ -59,31 +59,23 @@ def index():
 
 
 
-    title = Blog.query.all()
+    #title = Blog.query.all()
 
-    #completed_tasks = Task.query.filter_by(completed=True).all()
-
-    return render_template('blog.html', title=blog,title=title, body=body)
-
-
-
-
-
+    #return render_template('blog.html', title=blog,title=title, body=body)
 @app.route('/newpost', methods=['POST'])
 
 def new_post():
 
+    new_post_title = request.form('title')
+    new_post_body = request.form('body')
+    new_post_title_err = ''
+    new_post_body_err = ''
 
-
-    new_post_id = int(request.form['title-id'])
-
-    new_post = Task.query.get(new_post_id)
-
-    #task.completed = True
-
-    db.session.add(new_post)
-
-    db.session.commit()
+    if new_post_title == '':
+        new_post_title_err = "Please enter a valid Title"
+    
+    if new_post_body == '':
+        new_post_body_err = "Please enter a valid blog post"
 
 
 
