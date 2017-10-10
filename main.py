@@ -47,7 +47,7 @@ def index():
 
 
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         title_name = request.form['title']
 
@@ -57,32 +57,32 @@ def index():
 
         db.session.commit()
 
-
-
-    #title = Blog.query.all()
-
-    #return render_template('blog.html', title=blog,title=title, body=body)
-@app.route('/newpost', methods=['POST'])
-
+@app.route('/newpost', methods=['GET', 'POST'])
 def new_post():
+    if request.method == 'POST':
 
-    new_post_title = request.form('title')
-    new_post_body = request.form('body')
-    new_post_title_err = ''
-    new_post_body_err = ''
+        title = request.form['title']
+        body = request.form['body']
+        title_err = ''
+        body_err = ''
 
-    if new_post_title == '':
-        new_post_title_err = "Please enter a valid Title"
+        if new_post_title == '':
+            new_post_title_err = "Please enter a valid Title"
     
-    if new_post_body == '':
-        new_post_body_err = "Please enter a valid blog post"
+        if new_post_body == '':
+            new_post_body_err = "Please enter a valid blog post"
+
+    
+
+        blog = Blog(title, body)
+        db.session.add(blog)
+        db.session.commit()
+
+        return redirect('/blog')
 
 
-
-    return redirect('/blog')
-
-
-
+    else:
+        return render_template('newpost.html')
 
 
 if __name__ == '__main__':
