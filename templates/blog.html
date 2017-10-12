@@ -7,7 +7,8 @@
 <label>List of current Blogs:</label>
 <ul>
     {% for title in blog %}
-    <li>{{blog.title}}</li>
+        <li><a href="{{blog.title}}">{{blog.title}}</a></li>
+        <li>{{blog.body}}</li>
     {% endfor %}
 </ul>
 

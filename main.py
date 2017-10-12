@@ -26,7 +26,7 @@ class Blog(db.Model):
 
     title = db.Column(db.String(120))
 
-    body = db.Column(db.String(20,000))
+    body = db.Column(db.String(120))
 
 
 
@@ -35,29 +35,36 @@ class Blog(db.Model):
         self.title = title
         self.body = body
 
+    def __repr__(self):
+        return '<title %r>' % self.title
+
+    def __repr__(self):
+        return '<body %r>' % self.body
 
 
+def get_current_blogs():
+    return Blog.query.filter_by(title=True).all()
 
 
+@app.route('/blog', methods=['GET', 'POST'])
+def blog():
+    #use a 'GET' to go to the database to retreive the current submitted Blogs so they will be displayed on the main blog page. this is just a list of the blogs.
+    title_name = request.form['title']
 
+    body_content = request.form['body']
 
-@app.route('/blog', methods=['POST', 'GET'])
+    new_tile = Blog(title_name)
 
-def index():
+    new_body = Blog(body_content)
 
+    db.session.add(new_title, body_content)
 
+    db.session.commit()
 
-    if request.method == "POST":
+    blogs = Task.query.filter_by(title=False).all()
+    completed_blogs = Task.query.filter_by(title=True).all()
 
-        title_name = request.form['title']
-
-        new_tile = Blog(title_name)
-
-        db.session.add(new_title)
-
-        db.session.commit()
-
-@app.route('/newpost', methods=['GET', 'POST'])
+@app.route('/newpost', methods=['POST'])
 def new_post():
     if request.method == 'POST':
 
@@ -67,10 +74,10 @@ def new_post():
         body_err = ''
 
         if new_post_title == '':
-            new_post_title_err = "Please enter a valid Title"
+            title_err = "Please enter a valid Title"
     
         if new_post_body == '':
-            new_post_body_err = "Please enter a valid blog post"
+            body_err = "Please enter a valid blog post"
 
     
 
@@ -78,11 +85,16 @@ def new_post():
         db.session.add(blog)
         db.session.commit()
 
-        return redirect('/blog')
+        return redirect('/blog', title=title, body=body, body_err=body_err, title_err=title_err)
 
 
     else:
         return render_template('newpost.html')
+
+    @app.route('/')
+    def index():
+        encoded_error = request.args.get("error")
+        return render_template('blog.html', encoded_error=error, blog_list=get_current_blogs())
 
 
 if __name__ == '__main__':
