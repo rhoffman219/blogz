@@ -6,12 +6,12 @@
 
 <h1 align="center">New Post</h1>
 
-<form method='post' action='/blog'>
+<form method='post' action='/newpost'>
     <label style="margin-bottom: 15px;">New Blog Title:
         <br/><input type="text" name="title" value="{{title_err}}"/><p>{{title_err}}</p><br/>
     </label>
     <label style="margin-bottom: 15px; margin-top: 25px;">New Blog Content:
-        <br/><textarea cols="50" rows="10" type="text" name="body" value="{{body_err}}"><p>{{body_err}}</p></textarea><br/>
+        <br/><textarea cols="50" rows="10" type="text" name="body" value="{{body_err}}">{{body_err}}</textarea><br/>
     </label>
 
     <input type="submit" value="Add New Entry" />

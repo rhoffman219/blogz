@@ -3,12 +3,12 @@
 
 
 {% block content %}
-<h1>Blogs</h1>
+<h1 align="center">Blogs</h1>
 <label>List of current Blogs:</label>
 <ul>
-    {% for title in blog %}
-        <li><a href="{{blog.title}}">{{blog.title}}</a></li>
-        <li>{{blog.body}}</li>
+    {% for title in titles %}
+        <li><a href="{{title.title}}">{{title.title}}</a></li>
+        <li>{{body.body}}</li>
     {% endfor %}
 </ul>
 
