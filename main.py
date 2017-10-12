@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, flash, session
 
 
 
@@ -22,58 +22,68 @@ class Blog(db.Model):
 
         self.body = body
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/blog', methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
         title_name = request.form['title']
         new_title = Blog(title_name)
-        db.session.add(new_title)
+        db.session.add(new_title, body_content)
         db.session.commit()
 
     titles = Blog.query.all()
     return render_template('blog.html',title="Blogs!", titles=titles)
 
-@app.route('/blog', methods=['POST', 'GET'])
-def blog():
-    if request.method == "POST":
-        title_name = request.form['title']
-        body_content = request.form['body']
-        new_title = Blog(title_name)
-        new_body_content = Blog(body_content)
-        db.session.add(new_title, new_body_content)
-        db.session.commit()
-
 @app.route('/newpost', methods=['GET', 'POST'])
 def new_post():
 
-    if request.method == 'POST': 
+    if request.method == 'POST':
+
+
+
         title = request.form['title']
+
         body = request.form['body']
+
         title_err = ''
-        body_err = ''   
+
+        body_err = ''
+
+
 
         if title == '':
 
             title_err = "Please enter a valid Title"
 
-        elif body == '':
+    
+
+        if body == '':
 
             body_err = "Please enter a valid blog post"
 
-        if not title_err or not body_err:
-            blog = Blog(title, body)
 
-            db.session.add(blog)
 
-            db.session.commit()
+    
 
-            return render_template('blog.html', title=title, body=body)   
+
+
+        blog = Blog(title, body)
+
+        db.session.add(blog)
+
+        db.session.commit()
+
+
+
+        return redirect('/blog')
+
+
+
+
+
+    else:
         
-    
-    
-        else:
 
-            return render_template('newpost.html', title_err=title_err, body_err=body_err, title=title, body=body)
+        return render_template('newpost.html')       
 
 
 
