@@ -81,15 +81,16 @@ def new_post():
 
     
 
+        return render_template('newpost.html')
+
+
+    else:
         blog = Blog(title, body)
         db.session.add(blog)
         db.session.commit()
 
         return redirect('/blog', title=title, body=body, body_err=body_err, title_err=title_err)
-
-
-    else:
-        return render_template('newpost.html')
+        
 
     @app.route('/')
     def index():
