@@ -6,10 +6,9 @@
 <h1 align="center">Blogs</h1>
 <label>List of current Blogs:</label>
 <ul>
-    {% for title in titles %}
-        <li><a href="{{title.title}}">{{title.title}}</a></li>
-       
-        
+    {% for blog in blogs %}
+        <a href=/blog?id={{blog.id}}><h3>{{blog.title}}</h3></a>
+        <li>{{blog.body}}</li>
     {% endfor %}
 </ul>
 
