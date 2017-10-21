@@ -32,7 +32,7 @@ class Blog(db.Model):
     def __init__(self, title, body):
         
         self.title = title
-        
+
         self.body = body
         self.owner = owner
 
@@ -82,7 +82,27 @@ def new_post():
     return render_template('newpost.html')
 
 
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    username_err = ''
+    password_err = ''
 
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if username == '' or password == '':
+            username_err = 'Please enter a valid username'
+            password_err = 'Please enter a valid password'
+            return render_template('login.html', username_err=username_err, password_err=password_err)
+
+        else: 
+            user = User(username, password)
+            db.session.add(user)
+            db.session.commit()
+            return redirect('/newpost'#need to add session user here.)
+        
+    return render_template('login.html')
 
         
 
