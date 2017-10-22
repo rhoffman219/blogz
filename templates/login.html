@@ -7,11 +7,13 @@
 <h2>Login!</h2>
 
 <form action='/login' method='post'>
-    <label>Username:<input type='text' name='username' /> <p class='error' style='color: red;'>{{username_err}}</p>
+    <label>Email:<input type='text' name='username' /> <p class='error' style='color: red;'>{{username_err}}</p>
     </label>
 
-    <label>Password:<input type='text' name='password' /> <p class='error' style='color: red;'>{{password_err}}</p>
+    <label>Password:<input type='password' name='password' /> <p class='error' style='color: red;'>{{password_err}}</p>
     </label>
+
+    <p>New? please <a href='/signup'>signup</a> to post a blog!</p>
 
     <input type="submit" value="Login" />
 

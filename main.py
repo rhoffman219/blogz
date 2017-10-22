@@ -20,7 +20,12 @@ class User(db.Model):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        
+
+@app.before_request
+def require_login():
+    allowed_routes = ['blog', 'login', 'signup']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')       
 
 class Blog(db.Model):
 
@@ -90,19 +95,68 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        user = User.query.filter_by(username=username).first()
 
         if username == '' or password == '':
             username_err = 'Please enter a valid username'
             password_err = 'Please enter a valid password'
             return render_template('login.html', username_err=username_err, password_err=password_err)
-
-        else: 
+        
+        if user and user.password == password:
+            session['username'] = username
             user = User(username, password)
             db.session.add(user)
             db.session.commit()
-            return redirect('/newpost'#need to add session user here.)
+            return redirect('/newpost')
+
         
     return render_template('login.html')
+
+
+@app.route('/signup', methods=['POST', 'GET'])
+def signup():
+    username_err = ''
+    verify_err = ''
+    password_err = ''
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+
+        #TODO: need to validate user's data above. 
+        existing_user = User.query.filter_by(username=username).first()
+        
+        if username == '' or password == '' or verify == '':
+            username_err = 'Please enter a valid email'
+            password_err = 'Please enter a valid password'
+            verify_err = 'Please verify password'
+            return render_template('signup.html', username_err=username_err, password_err=password_err, verify_err=verify_err)
+
+        if '@' not in username or '.' not in username or ' ' in username:
+            username_err = 'Please enter a valid email'
+            return render_template('signup.html', username_err=username_err)
+        
+        if existing_user:  
+            username_err = 'This user already exists! Please login'
+            return render_template('signup.html', username_err=username_err)
+        
+        if not verify == password:
+            verify_err = 'Your passwords do not match!'
+            return render_template('signup.html', verify_err=verify_err) 
+
+        if not existing_user:
+            new_user = User(username, password)
+            db.session.add(new_user)
+            db.session.commit()
+            session['username'] = username
+            return redirect('/newpost')
+
+    return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/blog')
 
         
 
