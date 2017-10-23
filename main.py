@@ -23,8 +23,8 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['blog', 'login', 'signup']
-    if request.endpoint not in allowed_routes and 'email' not in session:
+    allowed_routes = ['blog', 'login', 'signup', 'index']
+    if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')       
 
 class Blog(db.Model):
@@ -34,20 +34,23 @@ class Blog(db.Model):
     body = db.Column(db.String(20000))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, body):
+    def __init__(self, title, body, owner):
         
         self.title = title
-
         self.body = body
-        self.owner = owner
+        self.owner = owner       
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
-
-    blogs = Blog.query.all()
+    if request.method == 'POST':
+        blog_title = request.form['title']
+        owner = User.query.filter_by(username=session['username']).first()
+        new_blog = Blog(blog_title, owner)
+        db.session.add(new_blog)
+        db.session.commit()
 
     
-    return render_template('blog.html', blogs=blogs)
+    return render_template('index.html')
 
 
 @app.route('/blog', methods=['POST', 'GET'])
@@ -71,7 +74,7 @@ def new_post():
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
-        
+        owner = User.query.filter_by(username=session['username']).first()
 
         if title == '' or body == '':
             title_err = "Please enter a valid title"
@@ -79,7 +82,7 @@ def new_post():
             return render_template('newpost.html', title_err=title_err, body_err=body_err)
 
         else:
-            blog = Blog(title, body)
+            blog = Blog(title, body, owner)
             db.session.add(blog)
             db.session.commit()
             return redirect('/blog?id=' + str(blog.id))
@@ -104,11 +107,11 @@ def login():
         
         if user and user.password == password:
             session['username'] = username
-            user = User(username, password)
-            db.session.add(user)
-            db.session.commit()
             return redirect('/newpost')
-
+    
+        else:
+            username_err = 'User does not exist! Please register to logon!'
+            return render_template('login.html', username_err=username_err)
         
     return render_template('login.html')
 

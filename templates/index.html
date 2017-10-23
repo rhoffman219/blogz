@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+<h1>Home</h1>
+<ul>
+    {% for owner in owner_id %}
+        <li>
+            <a href=/owner?id={{owner.id}}><h3>{{owner.name}}</h3></a>
+        </li>
+            
+    {% endfor %}
+    
+</ul>
+    
+{% endblock %}
