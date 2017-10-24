@@ -19,13 +19,7 @@ class User(db.Model):
     
     def __init__(self, username, password):
         self.username = username
-        self.password = password
-
-@app.before_request
-def require_login():
-    allowed_routes = ['blog', 'login', 'signup', 'index']
-    if request.endpoint not in allowed_routes and 'username' not in session:
-        return redirect('/login')       
+        self.password = password       
 
 class Blog(db.Model):
 
@@ -38,29 +32,32 @@ class Blog(db.Model):
         
         self.title = title
         self.body = body
-        self.owner = owner       
+        self.owner = owner   
+
+    
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    if request.method == 'POST':
-        blog_title = request.form['title']
-        owner = User.query.filter_by(username=session['username']).first()
-        new_blog = Blog(blog_title, owner)
-        db.session.add(new_blog)
-        db.session.commit()
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
-    
-    return render_template('index.html')
-
-
-@app.route('/blog', methods=['POST', 'GET'])
+@app.route('/blog')
 def blog():
+    id = request.args.get('id')
+    user = request.args.get('username')
 
-    if request.args:
-        id = request.args.get('id')
+    if id:
         blog = Blog.query.get(id)
-
         return render_template('singleblog.html', blog=blog)
+
+    if user:
+        blogs = Blog.query.filter_by(owner_id=user).all()
+        username = User.query.filter_by(id=user).first()
+        return render_template('singleUser.html', blogs=blogs, user=username)
+
+
+
+
 
     else:
         blogs = Blog.query.all()
@@ -126,7 +123,7 @@ def signup():
         password = request.form['password']
         verify = request.form['verify']
 
-        #TODO: need to validate user's data above. 
+         
         existing_user = User.query.filter_by(username=username).first()
         
         if username == '' or password == '' or verify == '':
@@ -138,6 +135,10 @@ def signup():
         if '@' not in username or '.' not in username or ' ' in username:
             username_err = 'Please enter a valid email'
             return render_template('signup.html', username_err=username_err)
+        
+        if len(password) < 3:
+            password_err = "Password must be longer than 3 characters!"
+            return render_template('signup.html', password_err=password_err)
         
         if existing_user:  
             username_err = 'This user already exists! Please login'
